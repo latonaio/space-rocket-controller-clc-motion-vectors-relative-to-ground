@@ -1,0 +1,13 @@
+version: "3"
+services:
+  space-rocket-controller-clc-motion-vectors-relative-to-ground:
+    container_name: space-rocket-controller-clc-motion-vectors-relative-to-ground
+    build:
+      context: .
+    volumes:
+      - .:/app
+    environment:
+#      - RABBITMQ_URL=amqp://guest:guest@localhost:5672/space
+      - RABBITMQ_URL=amqp://guest:guest@host.docker.internal:5672/space
+      - QUEUE_ORIGIN=space-rocket-controller-clc-motion-vectors-relative-to-ground-queue
+      - QUEUE_TO=space-rocket-xxxxxx-queue
