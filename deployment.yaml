@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: space-rocket-controller-clc-motion-vectors-relative-to-ground
+  name: space-rocket-controller-clc-motion-vectors-relative-to-ground
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: space-rocket-controller-clc-motion-vectors-relative-to-ground
+  strategy:
+    rollingUpdate:
+  template:
+    metadata:
+      labels:
+        run: space-rocket-controller-clc-motion-vectors-relative-to-ground
+    spec:
+      hostname: space-rocket-controller-clc-motion-vectors-relative-to-ground
+      containers:
+      - name: space-rocket-controller-clc-motion-vectors-relative-to-ground
+        tty: true
+        image: latonaio/space-rocket-controller-clc-motion-vectors-relative-to-ground:latest
+        imagePullPolicy: IfNotPresent
+        command: ["python3", "main.py"]
+        env:
+        - name: RABBITMQ_URL
+          value: amqp://guest:guest@rabbitmq:32094/space
+        - name: QUEUE_ORIGIN
+          value: space-rocket-controller-clc-motion-vectors-relative-to-ground-from-queue
+        - name: QUEUE_TO
+          value: space-rocket-controller-clc-motion-vectors-relative-to-ground-to-queue
+        volumeMounts:
+        - mountPath: /app
+          name: current-dir
+        securityContext:
+          privileged: true
+        workingDir: /app
+      volumes:
+      - name: current-dir
+        hostPath:
+          path: /current-dir-path
+          type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: space-rocket-controller-clc-motion-vectors-relative-to-ground
+  name: space-rocket-controller-clc-motion-vectors-relative-to-ground
+spec:
+  selector:
+    run: space-rocket-controller-clc-motion-vectors-relative-to-ground
+  type: ClusterIP
+  ports:
+  - port: 8890
+    targetPort: 8890
+    protocol: TCP
+---
