@@ -2,19 +2,16 @@ import numpy as np
 import logging
 import asyncio
 import os
-import json
 from rabbitmq_client import RabbitmqClient
-from npencoder import NpEncoder
 from motion_to_ground import GroundSpeeds
-from rocket_state_controller import MetaDataDistributor
+from space_rocket_state_controller import MetaDataDistributor
 from custom_logger import init_logger
 
 logger = logging.getLogger(__name__)
 
 
-def calculate():
+def calculate(mdd):
     try:
-        mdd = MetaDataDistributor()
         uvw = np.array([1, 1, 1])
         pqr = np.array([1, 1, 1])
         t_hb = np.ones([3, 3])
@@ -78,9 +75,11 @@ async def main():
                     'params': message.data,
                 })
 
-                result = calculate()
+                meta_data_distributor = MetaDataDistributor()
 
-                await mq_client.send(queue_to, json.dumps(result, cls=NpEncoder))
+                result = calculate(meta_data_distributor)
+
+                await mq_client.send(queue_to, meta_data_distributor.serialize(result))
         except Exception as e:
             logger.error({
                 'message': 'failed to connect rabbitmq!',

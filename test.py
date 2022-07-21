@@ -1,4 +1,4 @@
-from rocket_state_controller import MetaDataDistributor
+from space_rocket_state_controller import MetaDataDistributor
 from motion_to_ground import GroundSpeeds
 import numpy as np
 
